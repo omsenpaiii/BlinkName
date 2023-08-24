@@ -1,40 +1,59 @@
 // SIT210 2.1P
+
+// Pin number for the built-in LED
 int led = LED_BUILTIN;
-int buttonPin = 2; // Change this to the pin where your button is connected
+
+// Pin number where your button is connected
+int buttonPin = 2;
+
+// Variables to store the state of the button
 bool buttonState = false;
 bool lastButtonState = false;
 
+// Setup function runs once at the beginning
 void setup() {
+  // Set the LED pin as an output
   pinMode(led, OUTPUT);
+
+  // Set the button pin as an input with a pull-up resistor
   pinMode(buttonPin, INPUT_PULLUP);
+
+  // Start serial communication at a baud rate of 9600
   Serial.begin(9600);
 }
 
+// Main loop function
 void loop() {
+  // Read the current state of the button
   buttonState = digitalRead(buttonPin);
 
+  // Check if the button was just pressed (transition from HIGH to LOW)
   if (buttonState == LOW && lastButtonState == HIGH) {
-    // Button was pressed
+    // Button was pressed, read name from serial and blink it in Morse code
     String name = readNameFromSerial();
     blinkNameInMorse(name);
   }
 
+  // Save the current button state for the next iteration
   lastButtonState = buttonState;
 }
 
+// Function to read a name from the Serial input
 String readNameFromSerial() {
   String inputName = "";
+  // Read characters from Serial until a newline character ('\n') is received
   while (Serial.available() > 0) {
     char c = Serial.read();
     Serial.println(c);
     if (c == '\n') {
-      break;
+      break; // Exit the loop when newline is received
     }
-    inputName += c;
+    inputName += c; // Append characters to the inputName string
   }
   return inputName;
 }
 
+// Function to blink a dot
 void blinkDot() {
   digitalWrite(led, HIGH);
   delay(300);
@@ -42,6 +61,7 @@ void blinkDot() {
   delay(300);
 }
 
+// Function to blink a dash
 void blinkDash() {
   digitalWrite(led, HIGH);
   delay(900);
@@ -49,10 +69,14 @@ void blinkDash() {
   delay(300);
 }
 
+// Function to blink a name in Morse code
 void blinkNameInMorse(String name) {
+  // Iterate through each character in the name
   for (int i = 0; i < name.length(); i++) {
-    char c = tolower(name[i]);
+    char c = tolower(name[i]); // Convert to lowercase for case-insensitivity
+    // Translate characters to Morse code and blink accordingly
     switch (c) {
+      // Cases for each letter
       case 'a':
         blinkDot(); delay(600); blinkDash(); delay(900);
         break;
